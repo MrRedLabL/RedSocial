@@ -1,0 +1,117 @@
+INSERT INTO public."Usuario" (usuario_id, nombre, apellido, contrasena, correo, fecha_creacion, alias, telefono, pais, ciudad) VALUES
+(1, 'Carlos', 'Gómez', 'hash12345', 'carlos.gomez@gmail.com', '2023-01-15', 'charlie_g', 3001234567, 'Colombia', 'Bogotá'),
+(2, 'María', 'Fernández', 'segura55', 'maria.fer@hotmail.com', '2023-02-10', 'mafer_art', 3109876543, 'Colombia', 'Medellín'),
+(3, 'Alejandro', 'Ruiz', 'alex_pass', 'alejoruiz@outlook.com', '2023-03-05', 'alejo_dev', 3204567890, 'México', 'CDMX'),
+(4, 'Valentina', 'López', 'vale123', 'vlopez@gmail.com', '2023-03-20', 'valen_l', 3012345678, 'Argentina', 'Buenos Aires'),
+(5, 'Juan', 'Martínez', 'juanm_pass', 'juan.martinez@yahoo.com', '2023-04-01', 'juancho', 3156789012, 'Colombia', 'Cali'),
+(6, 'Sofía', 'Ramírez', 'sofi_love', 'sofia.ram@gmail.com', '2023-04-15', 'sofi_travel', 3009871234, 'España', 'Madrid'),
+(7, 'Diego', 'Torres', 'diego_gol', 'diego.torres@gmail.com', '2023-05-01', 'diego10', 3112233445, 'Colombia', 'Barranquilla'),
+(8, 'Camila', 'Vargas', 'camiv_pass', 'cami.vargas@hotmail.com', '2023-05-20', 'camila_v', 3215566778, 'Perú', 'Lima'),
+(9, 'Andrés', 'Castro', 'andy_music', 'andres.castro@gmail.com', '2023-06-01', 'andy_bass', 3134455667, 'Chile', 'Santiago'),
+(10, 'Lucía', 'Herrera', 'luci_sun', 'lucia.herrera@outlook.com', '2023-06-15', 'lucy_sky', 3028899001, 'Colombia', 'Bogotá');
+
+
+INSERT INTO public.perfil (perfil_id, usuario_id, foto_perfil, descripcion) VALUES
+(1, 1, 'url/carlos.jpg', 'Ingeniero de sistemas y amante del café'),
+(2, 2, 'url/maria.jpg', 'Diseñadora gráfica  | Viajera'),
+(3, 3, 'url/alex.jpg', 'Desarrollador Full Stack. Python & React'),
+(4, 4, 'url/valentina.jpg', 'Estudiante de Medicina '),
+(5, 5, 'url/juan.jpg', 'Aficionado a la fotografía y el fútbol '),
+(6, 6, 'url/sofia.jpg', 'Recorriendo el mundo, un país a la vez '),
+(7, 7, 'url/diego.jpg', 'Deportista de alto rendimiento'),
+(8, 8, 'url/camila.jpg', 'Amante de los gatos  y la lectura'),
+(9, 9, 'url/andres.jpg', 'Músico de sesión. Bajista.'),
+(10, 10, 'url/lucia.jpg', 'Marketing Digital y Redes Sociales ');
+
+
+INSERT INTO public.configuracion_usuario (configuracion_id, perfil_id, tipo_perfil, idioma) VALUES
+(1, 1, true, 'Español'),
+(2, 2, true, 'Inglés'),
+(3, 3, false, 'Español'),
+(4, 4, true, 'Español'),
+(5, 5, true, 'Español'),
+(6, 6, false, 'Inglés'),
+(7, 7, true, 'Español'),
+(8, 8, true, 'Español'),
+(9, 9, false, 'Inglés'),
+(10, 10, true, 'Francés');
+
+
+INSERT INTO public.rol_usuario (rol_usuario_id) VALUES
+(1), 
+(2), 
+(3); 
+
+
+INSERT INTO public.grupo (grupo_id, perfil_id, nombre_grupo, descripcion, rol_usuario_id) VALUES
+(1, 1, 'Desarrolladores Colombia', 'Grupo para programadores en Colombia', 1),
+(2, 2, 'Arte y Diseño', 'Espacio para compartir portafolios', 2),
+(3, 5, 'Fútbol 5 Bogotá', 'Organizamos partidos los fines de semana', 2),
+(4, 6, 'Mochileros por el Mundo', 'Tips de viaje baratos', 2),
+(5, 8, 'Club de Lectura', 'Lecturas del mes y debates', 2);
+
+
+INSERT INTO public.publicacion (publicacion_id, perfil_id, descripcion_post, fecha_creacion, tipo_media_id) VALUES
+(1, 1, 'Iniciando un nuevo proyecto en Python! ', '2023-07-01', 'texto'),
+(2, 2, 'Miren este atardecer en Medellín ', '2023-07-02', 'imagen'),
+(3, 3, 'Alguien sabe cómo solucionar este bug en React?', '2023-07-03', 'texto'),
+(4, 6, 'Ya en Madrid! Qué ciudad tan hermosa.', '2023-07-04', 'video'),
+(5, 5, 'Ganamos el partido de hoy 3-1 ', '2023-07-05', 'imagen'),
+(6, 8, 'Terminé de leer Cien Años de Soledad. Obra maestra.', '2023-07-06', 'texto'),
+(7, 10, '5 tips para mejorar tu alcance en Instagram ', '2023-07-07', 'carrusel'),
+(8, 1, 'Buscando recomendaciones de portátiles.', '2023-07-08', 'texto'),
+(9, 9, 'Ensayo con la banda anoche ', '2023-07-09', 'video'),
+(10, 4, 'Estudiando anatomía toda la noche ', '2023-07-10', 'imagen');
+
+
+INSERT INTO public.comentario (comentario_id, publicacion_id, descripcion_comentario, fecha_comentario, perfil_id) VALUES
+(1, 1, 'Mucho éxito con eso Carlos!', '2023-07-01', 3),
+(2, 2, 'Wow, qué colores!', '2023-07-02', 6),
+(3, 3, 'Revisa el useEffect, puede ser eso.', '2023-07-03', 1),
+(4, 5, 'Buena goleada!', '2023-07-05', 7),
+(5, 6, 'Es mi libro favorito sin duda.', '2023-07-06', 2),
+(6, 2, 'Tengo que ir pronto.', '2023-07-02', 4),
+(7, 9, 'Suenan brutal!', '2023-07-09', 10),
+(8, 1, 'Avísame si necesitas ayuda.', '2023-07-01', 9),
+(9, 7, 'Gracias por los tips!', '2023-07-07', 10),
+(10, 4, 'Disfruta mucho y come tapas!', '2023-07-04', 2);
+
+
+
+INSERT INTO public.seguidor (seguidor_id, perfil_id) VALUES (1, 1); 
+INSERT INTO public.seguido (seguido_id, perfil_id) VALUES (1, 2);
+
+INSERT INTO public.seguidor (seguidor_id, perfil_id) VALUES (2, 1);
+INSERT INTO public.seguido (seguido_id, perfil_id) VALUES (2, 3);
+
+
+INSERT INTO public.conversacion (conversacion_id, perfil_id) VALUES
+(1, 1), 
+(2, 2);
+
+INSERT INTO public.mensajeria (mensaje_id, conversacion_id, fecha_enviado, fecha_recibido, enviado, recibido, perfil_id) VALUES
+(1, 1, '2023-07-10', '2023-07-10', true, true, 1), 
+(2, 1, '2023-07-10', '2023-07-10', true, true, 2), 
+(3, 2, '2023-07-11', '2023-07-11', true, true, 2),
+(4, 2, '2023-07-11', null, true, false, 3);
+
+
+INSERT INTO public.solicitud (solicitud_id, fecha_solicitud, estado_solicitud, tipo_solicitud, perfilfil_id) VALUES
+(1, '2023-08-01', false, 'amistad', '3'), 
+(2, '2023-08-02', true, 'grupo', '5');
+
+
+INSERT INTO public.perfil_grupo (perfil_perfil_id, grupo_grupo_id) VALUES
+(1, 1), -
+(3, 1), 
+(2, 2), 
+(5, 3), 
+(7, 3); 
+
+
+INSERT INTO public."Dispositivo" (dispositivo_id, perfil_id) VALUES
+(1, 1), 
+(2, 1), 
+(3, 2), 
+(4, 3), 
+(5, 4);
