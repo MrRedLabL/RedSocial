@@ -1,0 +1,386 @@
+CREATE TABLE IF NOT EXISTS public."Usuario"
+(
+    usuario_id integer NOT NULL,
+    nombre character varying(50) NOT NULL,
+    apellido character varying(50),
+    contrasena character varying(50) NOT NULL,
+    correo character varying(50) NOT NULL,
+    fecha_creacion date NOT NULL,
+    alias character varying(50) NOT NULL,
+    telefono bigint,
+    pais character varying,
+    ciudad character varying,
+    PRIMARY KEY (usuario_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil
+(
+    perfil_id integer NOT NULL,
+    usuario_id integer,
+    foto_perfil character varying(250),
+    descripcion character varying(250),
+    PRIMARY KEY (perfil_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.configuracion_usuario
+(
+    configuracion_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    tipo_perfil boolean NOT NULL,
+    idioma character varying(50),
+    PRIMARY KEY (configuracion_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.seguido
+(
+    seguido_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    PRIMARY KEY (seguidor_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.seguidor
+(
+    seguidor_id integer NOT NULL,
+    perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.grupo
+(
+    grupo_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    nombre_grupo character varying(150) NOT NULL,
+    descripcion character varying(250),
+    rol_usuario_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.rol_usuario
+(
+    rol_usuario_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.publicacion
+(
+    publicacion_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    descripcion_post character varying(250),
+    fecha_creacion date,
+    tipo_media_id character varying,
+    PRIMARY KEY (publicacion_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.comentario
+(
+    comentario_id integer NOT NULL,
+    publicacion_id integer NOT NULL,
+    descripcion_comentario character varying,
+    fecha_comentario date NOT NULL,
+    perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.compartido
+(
+    compartido_id integer NOT NULL,
+    publicacion_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    fecha_compartido date NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.conversacion
+(
+    conversacion_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    PRIMARY KEY (conversacion_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.mensajeria
+(
+    mensaje_id integer NOT NULL,
+    conversacion_id integer NOT NULL,
+    fecha_enviado date NOT NULL,
+    fecha_recibido date,
+    PRIMARY KEY (mensaje_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.notificacion
+(
+    notificacion_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    fecha_notificacion date NOT NULL,
+    PRIMARY KEY (notificacion_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.reporte
+(
+    reporte_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    fecha_reporte date NOT NULL,
+    PRIMARY KEY (reporte_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.reportado
+(
+    reportado_id integer NOT NULL,
+    perfil_id integer NOT NULL,
+    motivo character varying NOT NULL,
+    PRIMARY KEY (reportado_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.solicitud
+(
+    solicitud_id integer NOT NULL,
+    fecha_solicitud date NOT NULL,
+    estado_solicitud boolean NOT NULL,
+    tipo_solicitud character varying NOT NULL,
+    perfilfil_id character varying NOT NULL,
+    PRIMARY KEY (solicitud_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.etiqueta
+(
+    etiqueta_id integer NOT NULL,
+    publicacion_id integer NOT NULL,
+    PRIMARY KEY (etiqueta_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil_grupo
+(
+    perfil_perfil_id integer NOT NULL,
+    grupo_perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.grupo_rol_usuario
+(
+    grupo_grupo_id integer NOT NULL,
+    rol_usuario_rol_usuario_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.publicacion_compartido
+(
+    publicacion_publicacion_id integer NOT NULL,
+    compartido_compartido_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil_compartido
+(
+    perfil_perfil_id integer NOT NULL,
+    compartido_perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil_conversacion
+(
+    perfil_perfil_id integer NOT NULL,
+    conversacion_perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil_reporte
+(
+    perfil_perfil_id integer NOT NULL,
+    reporte_perfil_id integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.perfil_solicitud
+(
+    perfil_perfil_id integer NOT NULL,
+    solicitud_perfilfil_id character varying NOT NULL
+);
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (usuario_id)
+    REFERENCES public."Usuario" (usuario_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.configuracion_usuario (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.seguido (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.seguidor (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.publicacion (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.comentario (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil
+    ADD FOREIGN KEY (perfil_id)
+    REFERENCES public.notificacion (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.publicacion
+    ADD FOREIGN KEY (publicacion_id)
+    REFERENCES public.etiqueta (publicacion_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.publicacion
+    ADD FOREIGN KEY (publicacion_id)
+    REFERENCES public.comentario (publicacion_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.conversacion
+    ADD FOREIGN KEY (conversacion_id)
+    REFERENCES public.mensajeria (conversacion_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.reporte
+    ADD FOREIGN KEY (reporte_id)
+    REFERENCES public.reportado (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_grupo
+    ADD FOREIGN KEY (perfil_perfil_id)
+    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_grupo
+    ADD FOREIGN KEY (grupo_perfil_id)
+    REFERENCES public.grupo (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.grupo_rol_usuario
+    ADD FOREIGN KEY (grupo_grupo_id)
+    REFERENCES public.grupo (grupo_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.grupo_rol_usuario
+    ADD FOREIGN KEY (rol_usuario_rol_usuario_id)
+    REFERENCES public.rol_usuario (rol_usuario_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.publicacion_compartido
+    ADD FOREIGN KEY (publicacion_publicacion_id)
+    REFERENCES public.publicacion (publicacion_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.publicacion_compartido
+    ADD FOREIGN KEY (compartido_compartido_id)
+    REFERENCES public.compartido (compartido_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_compartido
+    ADD FOREIGN KEY (perfil_perfil_id)
+    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_compartido
+    ADD FOREIGN KEY (compartido_perfil_id)
+    REFERENCES public.compartido (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_conversacion
+    ADD FOREIGN KEY (perfil_perfil_id)
+    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_conversacion
+    ADD FOREIGN KEY (conversacion_perfil_id)
+    REFERENCES public.conversacion (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_reporte
+    ADD FOREIGN KEY (perfil_perfil_id)
+    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_reporte
+    ADD FOREIGN KEY (reporte_perfil_id)
+    REFERENCES public.reporte (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_solicitud
+    ADD FOREIGN KEY (perfil_perfil_id)
+    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+
+ALTER TABLE IF EXISTS public.perfil_solicitud
+    ADD FOREIGN KEY (solicitud_perfilfil_id)
+    REFERENCES public.solicitud (perfilfil_id) MATCH SIMPLE
+    ON UPDATE NO ACTION
+    ON DELETE NO ACTION
+    NOT VALID;
+
+END;
