@@ -1,386 +1,190 @@
-CREATE TABLE IF NOT EXISTS public."Usuario"
-(
-    usuario_id integer NOT NULL,
-    nombre character varying(50) NOT NULL,
-    apellido character varying(50),
-    contrasena character varying(50) NOT NULL,
-    correo character varying(50) NOT NULL,
-    fecha_creacion date NOT NULL,
-    alias character varying(50) NOT NULL,
-    telefono bigint,
-    pais character varying,
-    ciudad character varying,
+CREATE TABLE usuario (
+    usuario_id INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(45) NOT NULL,
+    apellido VARCHAR(45) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    correo VARCHAR(255) NOT NULL,
+    fecha_creacion DATE,
+    alias VARCHAR(25),
+    telefono INT,
+    pais VARCHAR(255),
+    ciudad VARCHAR(255),
     PRIMARY KEY (usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.perfil
-(
-    perfil_id integer NOT NULL,
-    usuario_id integer,
-    foto_perfil character varying(250),
-    descripcion character varying(250),
-    PRIMARY KEY (perfil_id)
+CREATE TABLE perfil (
+    perfil_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    foto_perfil VARCHAR(255),
+    descripcion VARCHAR(255),
+    PRIMARY KEY (perfil_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.configuracion_usuario
-(
-    configuracion_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    tipo_perfil boolean NOT NULL,
-    idioma character varying(50),
-    PRIMARY KEY (configuracion_id)
+CREATE TABLE configuracion_usuario (
+    configuracion_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    tipo_perfil BOOLEAN DEFAULT TRUE,
+    idioma ENUM('Español', 'Ingles', 'Portugues', 'Frances'),
+    PRIMARY KEY (configuracion_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.seguido
-(
-    seguido_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    PRIMARY KEY (seguidor_id)
+CREATE TABLE dispositivo_vinculado (
+    dispositivo_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    estado BOOLEAN DEFAULT TRUE,
+    fecha_vinculacion_disp DATE,
+    PRIMARY KEY (dispositivo_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.seguidor
-(
-    seguidor_id integer NOT NULL,
-    perfil_id integer NOT NULL
+CREATE TABLE grupo (
+    grupo_id INT NOT NULL AUTO_INCREMENT,
+    nombre_grupo VARCHAR(45) NOT NULL,
+    descripcion VARCHAR(255),
+    usuario_creador_id INT NOT NULL,
+    usuario_administrador_id INT NOT NULL,
+    PRIMARY KEY (grupo_id),
+    FOREIGN KEY (usuario_creador_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_administrador_id) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.grupo
-(
-    grupo_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    nombre_grupo character varying(150) NOT NULL,
-    descripcion character varying(250),
-    rol_usuario_id integer NOT NULL
+CREATE TABLE integrante_grupo (
+    usuario_id INT NOT NULL,
+    grupo_id INT NOT NULL,
+    rol ENUM('miembro', 'administrador', 'creador'),
+    PRIMARY KEY (usuario_id, grupo_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (grupo_id) REFERENCES grupo(grupo_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.rol_usuario
-(
-    rol_usuario_id integer NOT NULL
+CREATE TABLE relacion (
+    seguidor_id INT NOT NULL,
+    seguido_id INT NOT NULL,
+    PRIMARY KEY (seguidor_id, seguido_id),
+    FOREIGN KEY (seguidor_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (seguido_id) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.publicacion
-(
-    publicacion_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    descripcion_post character varying(250),
-    fecha_creacion date,
-    tipo_media_id character varying,
-    PRIMARY KEY (publicacion_id)
+CREATE TABLE solicitud (
+    solicitud_id INT NOT NULL AUTO_INCREMENT,
+    usuario_solicitante INT NOT NULL,
+    usuario_solicitado INT NOT NULL,
+    tipo_solicitud ENUM('seguimiento', 'amistad'),
+    PRIMARY KEY (solicitud_id),
+    FOREIGN KEY (usuario_solicitante) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_solicitado) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.comentario
-(
-    comentario_id integer NOT NULL,
-    publicacion_id integer NOT NULL,
-    descripcion_comentario character varying,
-    fecha_comentario date NOT NULL,
-    perfil_id integer NOT NULL
+CREATE TABLE bloqueo (
+    bloqueo_id INT NOT NULL AUTO_INCREMENT,
+    usuario_bloqueado INT NOT NULL,
+    usuario_bloqueador INT NOT NULL,
+    PRIMARY KEY (bloqueo_id),
+    FOREIGN KEY (usuario_bloqueado) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_bloqueador) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.compartido
-(
-    compartido_id integer NOT NULL,
-    publicacion_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    fecha_compartido date NOT NULL
+CREATE TABLE publicacion (
+    post_id INT NOT NULL AUTO_INCREMENT,
+    usuario_creador_id INT NOT NULL,
+    descripcion_post VARCHAR(255),
+    fecha_creacion DATE,
+    tipo_media ENUM('imagen', 'video', 'GIF'),
+    ruta_media VARCHAR(255),
+    PRIMARY KEY (post_id),
+    FOREIGN KEY (usuario_creador_id) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.conversacion
-(
-    conversacion_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    PRIMARY KEY (conversacion_id)
+CREATE TABLE etiqueta (
+    etiqueta_id INT NOT NULL AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    usuario_etiquetado INT NOT NULL,
+    usuario_etiquetador INT NOT NULL,
+    PRIMARY KEY (etiqueta_id),
+    FOREIGN KEY (post_id) REFERENCES publicacion(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_etiquetado) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_etiquetador) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.mensajeria
-(
-    mensaje_id integer NOT NULL,
-    conversacion_id integer NOT NULL,
-    fecha_enviado date NOT NULL,
-    fecha_recibido date,
-    PRIMARY KEY (mensaje_id)
+CREATE TABLE comentario (
+    comentario_id INT NOT NULL AUTO_INCREMENT,
+    post_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    descripcion_comentario VARCHAR(255),
+    fecha_comentario DATE,
+    PRIMARY KEY (comentario_id),
+    FOREIGN KEY (post_id) REFERENCES publicacion(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.notificacion
-(
-    notificacion_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    fecha_notificacion date NOT NULL,
-    PRIMARY KEY (notificacion_id)
+CREATE TABLE interaccion_publicacion (
+    usuario_id INT NOT NULL,
+    post_id INT NOT NULL,
+    tipo_interaccion ENUM('reportar', 'compartir', 'comentar', 'guardar', 'etiquetar'),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (post_id) REFERENCES publicacion(post_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.reporte
-(
-    reporte_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    fecha_reporte date NOT NULL,
-    PRIMARY KEY (reporte_id)
+CREATE TABLE compartido_publico (
+    compartido_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    post_id INT NOT NULL,
+    fecha_compartido DATE,
+    PRIMARY KEY (compartido_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (post_id) REFERENCES publicacion(post_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.reportado
-(
-    reportado_id integer NOT NULL,
-    perfil_id integer NOT NULL,
-    motivo character varying NOT NULL,
-    PRIMARY KEY (reportado_id)
+CREATE TABLE publicacion_guardada (
+    guardado_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    post_id INT NOT NULL,
+    PRIMARY KEY (guardado_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (post_id) REFERENCES publicacion(post_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.solicitud
-(
-    solicitud_id integer NOT NULL,
-    fecha_solicitud date NOT NULL,
-    estado_solicitud boolean NOT NULL,
-    tipo_solicitud character varying NOT NULL,
-    perfilfil_id character varying NOT NULL,
-    PRIMARY KEY (solicitud_id)
+CREATE TABLE reporte (
+    reporte_id INT NOT NULL AUTO_INCREMENT,
+    usuario_reportado INT NOT NULL,
+    usuario_reportador INT NOT NULL,
+    motivo VARCHAR(255),
+    PRIMARY KEY (reporte_id),
+    FOREIGN KEY (usuario_reportado) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_reportador) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.etiqueta
-(
-    etiqueta_id integer NOT NULL,
-    publicacion_id integer NOT NULL,
-    PRIMARY KEY (etiqueta_id)
+CREATE TABLE conversacion (
+    conversacion_id INT NOT NULL AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    fecha_conversacion DATE,
+    PRIMARY KEY (conversacion_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.perfil_grupo
-(
-    perfil_perfil_id integer NOT NULL,
-    grupo_perfil_id integer NOT NULL
+CREATE TABLE mensajeria (
+    mensaje_id INT NOT NULL AUTO_INCREMENT,
+    conversacion_id INT NOT NULL,
+    usuario_remitente INT NOT NULL,
+    usuario_destinatario INT NOT NULL,
+    descripcion_mensaje VARCHAR(255),
+    fecha_envio DATE,
+    fecha_recibido DATE,
+    estado_mensaje ENUM('enviado', 'recibido', 'leído', 'borrado'),
+    PRIMARY KEY (mensaje_id),
+    FOREIGN KEY (conversacion_id) REFERENCES conversacion(conversacion_id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_remitente) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_destinatario) REFERENCES usuario(usuario_id)
 );
 
-CREATE TABLE IF NOT EXISTS public.grupo_rol_usuario
-(
-    grupo_grupo_id integer NOT NULL,
-    rol_usuario_rol_usuario_id integer NOT NULL
+CREATE TABLE notificacion (
+    notificacion_id INT NOT NULL AUTO_INCREMENT,
+    usuario_receptor INT NOT NULL,
+    usuario_emisor INT NOT NULL,
+    interaccion_id INT,
+    PRIMARY KEY (notificacion_id),
+    FOREIGN KEY (usuario_receptor) REFERENCES usuario(usuario_id),
+    FOREIGN KEY (usuario_emisor) REFERENCES usuario(usuario_id)
 );
-
-CREATE TABLE IF NOT EXISTS public.publicacion_compartido
-(
-    publicacion_publicacion_id integer NOT NULL,
-    compartido_compartido_id integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.perfil_compartido
-(
-    perfil_perfil_id integer NOT NULL,
-    compartido_perfil_id integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.perfil_conversacion
-(
-    perfil_perfil_id integer NOT NULL,
-    conversacion_perfil_id integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.perfil_reporte
-(
-    perfil_perfil_id integer NOT NULL,
-    reporte_perfil_id integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.perfil_solicitud
-(
-    perfil_perfil_id integer NOT NULL,
-    solicitud_perfilfil_id character varying NOT NULL
-);
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (usuario_id)
-    REFERENCES public."Usuario" (usuario_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.configuracion_usuario (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.seguido (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.seguidor (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.publicacion (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.comentario (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil
-    ADD FOREIGN KEY (perfil_id)
-    REFERENCES public.notificacion (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.publicacion
-    ADD FOREIGN KEY (publicacion_id)
-    REFERENCES public.etiqueta (publicacion_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.publicacion
-    ADD FOREIGN KEY (publicacion_id)
-    REFERENCES public.comentario (publicacion_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.conversacion
-    ADD FOREIGN KEY (conversacion_id)
-    REFERENCES public.mensajeria (conversacion_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.reporte
-    ADD FOREIGN KEY (reporte_id)
-    REFERENCES public.reportado (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_grupo
-    ADD FOREIGN KEY (perfil_perfil_id)
-    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_grupo
-    ADD FOREIGN KEY (grupo_perfil_id)
-    REFERENCES public.grupo (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.grupo_rol_usuario
-    ADD FOREIGN KEY (grupo_grupo_id)
-    REFERENCES public.grupo (grupo_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.grupo_rol_usuario
-    ADD FOREIGN KEY (rol_usuario_rol_usuario_id)
-    REFERENCES public.rol_usuario (rol_usuario_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.publicacion_compartido
-    ADD FOREIGN KEY (publicacion_publicacion_id)
-    REFERENCES public.publicacion (publicacion_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.publicacion_compartido
-    ADD FOREIGN KEY (compartido_compartido_id)
-    REFERENCES public.compartido (compartido_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_compartido
-    ADD FOREIGN KEY (perfil_perfil_id)
-    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_compartido
-    ADD FOREIGN KEY (compartido_perfil_id)
-    REFERENCES public.compartido (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_conversacion
-    ADD FOREIGN KEY (perfil_perfil_id)
-    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_conversacion
-    ADD FOREIGN KEY (conversacion_perfil_id)
-    REFERENCES public.conversacion (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_reporte
-    ADD FOREIGN KEY (perfil_perfil_id)
-    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_reporte
-    ADD FOREIGN KEY (reporte_perfil_id)
-    REFERENCES public.reporte (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_solicitud
-    ADD FOREIGN KEY (perfil_perfil_id)
-    REFERENCES public.perfil (perfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-
-ALTER TABLE IF EXISTS public.perfil_solicitud
-    ADD FOREIGN KEY (solicitud_perfilfil_id)
-    REFERENCES public.solicitud (perfilfil_id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-    NOT VALID;
-
-END;
